@@ -15,10 +15,12 @@ on:
       - main
     paths:
       - "pkg/gpu/mockamdsmi/**"
+      - "cmd/generate-amdsmi-bridge/**"
       - ".github/workflows/amd-sim.yaml"
   pull_request:
     paths:
       - "pkg/gpu/mockamdsmi/**"
+      - "cmd/generate-amdsmi-bridge/**"
       - ".github/workflows/amd-sim.yaml"
   workflow_dispatch:
 
@@ -63,3 +65,9 @@ jobs:
 
       - name: Vet, gofmt and unit tests (AMD paths)
         run: make -C pkg/gpu/mockamdsmi test
+
+      - name: Generated stubs are up to date
+        run: make -C pkg/gpu/mockamdsmi check-generated
+
+      - name: Stub libraries export exactly the real ABI
+        run: make -C pkg/gpu/mockamdsmi check-abi

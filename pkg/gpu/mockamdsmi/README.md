@@ -13,8 +13,13 @@ the Wave 0 evidence it rests on and the execution plan are in
 | [`faults`](faults/) | The fault catalog, compiled to override patches and one-shot actions |
 | [`sysfs`](sysfs/) | Paths the consumers read, overlay mount points, the in-place write rule |
 | [`configs`](configs/) | Example profiles (synthetic until replaced by hardware captures) |
+| [`abi`](abi/) | Vendored ROCm headers and the real libraries' export lists |
+| [`bridge`](bridge/) | Generated `NOT_SUPPORTED` stubs for both libraries ([generator](../../../docs/tools/generate-amdsmi-bridge.md)) |
+
+Profiles come from real nodes through [`tools/amd-capture`](../../../tools/amd-capture/README.md).
 
 ```bash
 make -C pkg/gpu/mockamdsmi test   # go vet, gofmt, go test (AMD paths only)
 make -C pkg/gpu/mockamdsmi lint   # golangci-lint with the repository config
+make -C pkg/gpu/mockamdsmi check-generated check-abi
 ```
