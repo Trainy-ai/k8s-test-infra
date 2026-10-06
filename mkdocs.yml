@@ -157,6 +157,7 @@ nav:
       - Tools:
           - check-fabric: tools/check-fabric.md
           - generate-bridge: tools/generate-bridge.md
+          - generate-amdsmi-bridge: tools/generate-amdsmi-bridge.md
       - Enhancement Proposals: contributing/enhancements.md
       - Pull Requests: contributing/pull-requests.md
       - Repository Automation: maintainers/repository-automation.md
