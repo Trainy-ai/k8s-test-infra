@@ -1,0 +1,65 @@
+# Copyright 2026 Trainy, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+# AMD GPU simulator (MEP-1001): fast checks for the AMD-only paths. Kept in a
+# workflow of its own so the fork never edits upstream's workflows.
+#
+# Deliberately unfiltered by base branch: the AMD work lands as stacked PRs,
+# and a `branches` filter matches the PR's base, so a PR stacked on another
+# feature branch would run none of this.
+name: amd-sim
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "pkg/gpu/mockamdsmi/**"
+      - ".github/workflows/amd-sim.yaml"
+  pull_request:
+    paths:
+      - "pkg/gpu/mockamdsmi/**"
+      - ".github/workflows/amd-sim.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Get Go version
+        id: golang
+        run: echo "version=$(./hack/golang-version.sh)" >> "$GITHUB_OUTPUT"
+
+      - name: Install Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ steps.golang.outputs.version }}
+
+      - name: Read the pinned golangci-lint version
+        id: golangci-lint
+        run: echo "version=$(make -s print-golangci-lint-version)" >> "$GITHUB_OUTPUT"
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9
+        with:
+          version: ${{ steps.golangci-lint.outputs.version }}
+          install-only: true
+
+      - name: Lint (AMD paths)
+        run: make -C pkg/gpu/mockamdsmi lint
+
+      - name: Vet, gofmt and unit tests (AMD paths)
+        run: make -C pkg/gpu/mockamdsmi test

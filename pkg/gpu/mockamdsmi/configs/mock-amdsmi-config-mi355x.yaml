@@ -1,0 +1,163 @@
+# Copyright 2026 Trainy, Inc.
+# SPDX-License-Identifier: Apache-2.0
+#
+# AMD Instinct MI355X, 8 GPUs, SPX/NPS1, ROCm 7.2.1.
+#
+# SYNTHETIC UNTIL REPLACED BY A CAPTURE. Identity and topology follow the
+# Wave 0 spike (MEP-1001): the BDFs, PCI ids, KFD ids and render minors that
+# the real amd-smi 26.2.2 CLI and rocm/k8s-device-plugin accepted. Every
+# measured value (temperatures, power, firmware, VBIOS, serials, limits) is a
+# plausible placeholder. Replace this file with one generated from a
+# tools/amd-capture/ tarball of a real MI355X node before writing any golden
+# contract test against it.
+#
+# Schema: pkg/gpu/mockamdsmi/profile (types.go documents every field).
+# gpu_defaults is merged under each gpus entry; xgmi_full_mesh links every
+# GPU pair.
+
+version: 1
+name: mi355x-8gpu
+source:
+  kind: synthetic
+  note: Wave 0 spike shapes; measured values are placeholders pending capture.
+
+node:
+  software:
+    rocm_version: 7.2.1
+    amdsmi_lib_version: 26.2.2
+    rocm_smi_lib_version: 7.8.0
+  driver:
+    initstate: live
+    version: 6.14.14
+  kfd:
+    device: char_device
+  host:
+    hypervisor: false
+    numa_nodes: 2
+
+xgmi_full_mesh:
+  weight: 15
+  min_bandwidth_mbps: 0
+  max_bandwidth_mbps: 64000
+
+gpu_defaults:
+  identity:
+    vendor_id: 0x1002
+    device_id: 0x75a3
+    subsystem_vendor_id: 0x1002
+    subsystem_id: 0x75a3
+    revision_id: 0x00
+    pci_class: 0x120000
+    market_name: AMD Instinct MI355X
+    gfx_version: gfx950
+    vram_bytes: 309237645312      # 288 GiB HBM3E
+    vbios:
+      name: AMD MI355X SYNTHETIC
+      part_number: 113-SYNTHETIC-000
+      version: 022.040.003.000.000000
+      build_date: 2026/01/01 00:00
+    firmware:
+      sos: "0x00480046"
+      smu: "0x00557100"
+  kfd:
+    gfx_target_version: 90500
+    simd_count: 1024
+    array_count: 32
+    num_xcc: 8
+  partition:
+    compute: SPX
+    memory: NPS1
+  ecc:
+    blocks:
+      umc: {correctable: 0, uncorrectable: 0, deferred: 0}
+      sdma: {correctable: 0, uncorrectable: 0, deferred: 0}
+      gfx: {correctable: 0, uncorrectable: 0, deferred: 0}
+      mmhub: {correctable: 0, uncorrectable: 0, deferred: 0}
+      pcie_bif: {correctable: 0, uncorrectable: 0, deferred: 0}
+      hdp: {correctable: 0, uncorrectable: 0, deferred: 0}
+      xgmi_wafl: {correctable: 0, uncorrectable: 0, deferred: 0}
+  pcie:
+    width: 16
+    max_width: 16
+    speed_mts: 32000
+    max_speed_mts: 32000
+    replay_count: 0
+    replay_rollover_count: 0
+    nak_sent_count: 0
+    nak_received_count: 0
+    l0_to_recovery_count: 0
+  xgmi:
+    hive_id: 0xd2a5c3b19f8e7a61
+  temperatures:
+    hotspot: {current: 42, critical: 110, emergency: 115, shutdown: 120}
+    vram: {current: 38, critical: 100, emergency: 105, shutdown: 110}
+    # No edge sensor on MI300-class parts: amd-smi prints N/A for it.
+  power:
+    socket_w: 210
+    cap_w: 1400
+    default_cap_w: 1400
+    min_cap_w: 0
+    max_cap_w: 1400
+    ptl: {enabled: false, formats: [I8, F16, BF16, F32, F64]}
+  metrics:
+    gfx_activity_pct: 0
+    umc_activity_pct: 0
+    mm_activity_pct: 0
+    gfx_clock_mhz: 132
+    mem_clock_mhz: 900
+    energy_accumulator: 0
+    xgmi_link_width: 16
+    xgmi_link_speed_gbps: 38
+
+# card/renderD start at 8/136, clear of the virtual-display DRM nodes cloud
+# VMs expose (Wave 0: an Azure host's card1 shadowed the simulated one). The
+# node agent remaps through the override document if these collide anyway.
+gpus:
+  - bdf: "0000:05:00.0"
+    uuid: 10ff75a3-0000-1000-8005-a1b2c3d4e5f6
+    numa_node: 0
+    identity: {asic_serial: "0xSYNTH0000000000"}
+    kfd: {gpu_id: 10000, node_id: 2, unique_id: 0xa1b2c3d4e5f60000}
+    drm: {card: 8, render_minor: 136}
+  - bdf: "0000:15:00.0"
+    uuid: 10ff75a3-0000-1000-8015-a1b2c3d4e5f6
+    numa_node: 0
+    identity: {asic_serial: "0xSYNTH0000000001"}
+    kfd: {gpu_id: 11111, node_id: 3, unique_id: 0xa1b2c3d4e5f60001}
+    drm: {card: 9, render_minor: 137}
+  - bdf: "0000:65:00.0"
+    uuid: 10ff75a3-0000-1000-8065-a1b2c3d4e5f6
+    numa_node: 0
+    identity: {asic_serial: "0xSYNTH0000000002"}
+    kfd: {gpu_id: 12222, node_id: 4, unique_id: 0xa1b2c3d4e5f60002}
+    drm: {card: 10, render_minor: 138}
+  - bdf: "0000:75:00.0"
+    uuid: 10ff75a3-0000-1000-8075-a1b2c3d4e5f6
+    numa_node: 0
+    identity: {asic_serial: "0xSYNTH0000000003"}
+    kfd: {gpu_id: 13333, node_id: 5, unique_id: 0xa1b2c3d4e5f60003}
+    drm: {card: 11, render_minor: 139}
+  - bdf: "0000:85:00.0"
+    uuid: 10ff75a3-0000-1000-8085-a1b2c3d4e5f6
+    numa_node: 1
+    identity: {asic_serial: "0xSYNTH0000000004"}
+    kfd: {gpu_id: 14444, node_id: 6, unique_id: 0xa1b2c3d4e5f60004}
+    drm: {card: 12, render_minor: 140}
+  - bdf: "0000:95:00.0"
+    uuid: 10ff75a3-0000-1000-8095-a1b2c3d4e5f6
+    numa_node: 1
+    identity: {asic_serial: "0xSYNTH0000000005"}
+    kfd: {gpu_id: 15555, node_id: 7, unique_id: 0xa1b2c3d4e5f60005}
+    drm: {card: 13, render_minor: 141}
+  - bdf: "0000:e5:00.0"
+    uuid: 10ff75a3-0000-1000-80e5-a1b2c3d4e5f6
+    numa_node: 1
+    identity: {asic_serial: "0xSYNTH0000000006"}
+    kfd: {gpu_id: 16666, node_id: 8, unique_id: 0xa1b2c3d4e5f60006}
+    drm: {card: 14, render_minor: 142}
+  - bdf: "0000:f5:00.0"
+    uuid: 10ff75a3-0000-1000-80f5-a1b2c3d4e5f6
+    numa_node: 1
+    identity: {asic_serial: "0xSYNTH0000000007"}
+    kfd: {gpu_id: 17777, node_id: 9, unique_id: 0xa1b2c3d4e5f60007}
+    drm: {card: 15, render_minor: 143}
